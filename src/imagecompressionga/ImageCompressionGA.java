@@ -22,7 +22,7 @@ public class ImageCompressionGA {
     ///////////////////////////////////////// Image properties.
     private final int width = 600;
     private final int height = 400;
-    private final String imgAddress = "testImg.jpg";
+    private final String imgAddress = "flying.bmp";
     private final int cols = 20;
     private final int rows = 20;
     //////////////////////////////////////////
@@ -30,7 +30,7 @@ public class ImageCompressionGA {
     private BufferedImage image = null;
     private final int blocks = cols * rows;
     private BufferedImage[] blocksArray = new BufferedImage[this.blocks];
-    private Rationalize[] rationalizedBlocks = new Rationalize[this.blocks];
+    private Evolution[] evolvedBlocks = new Evolution[this.blocks];
 
     /**
      * Start Main method for running the image compression.
@@ -41,7 +41,7 @@ public class ImageCompressionGA {
         //Step 1
         this.createSubImg();
         //Step 2
-        this.rationalizeBlocks();
+        this.evolveBlocks();
         //Step 3
         //ToDo
         //Save Compressed Image
@@ -52,23 +52,21 @@ public class ImageCompressionGA {
      * Rationalize Blocks Method for concatenating the values of every Pixel in
      * RGB as one string.
      */
-    public void rationalizeBlocks() {
-        for(int i = 0; i < this.blocks; i++){
-            this.rationalizedBlocks[i] = new Rationalize(this.blocksArray[i]);
+    public void evolveBlocks() {
+        for (int i = 0; i < this.blocks; i++) {
+            this.evolvedBlocks[i] = new Evolution(this.blocksArray[i]);
         }
-        for(int i = 0; i < this.blocks; i++){
-            this.rationalizedBlocks[i].start();
+        for (int i = 0; i < this.blocks; i++) {
+            this.evolvedBlocks[i].start();
         }
-        for(int i = 0; i < this.blocks; i++){
+        for (int i = 0; i < this.blocks; i++) {
             try {
-            this.rationalizedBlocks[i].join();
-            } catch(InterruptedException e){
+                this.evolvedBlocks[i].join();
+            } catch (InterruptedException e) {
                 System.err.println(e);
             }
         }
-        System.out.println("Rationalizing Done.");
-        long rationalNumber = new BigInteger(this.rationalizedBlocks[0].rationalizedBlock, 2).longValue();
-        System.out.println(rationalNumber);
+        System.out.println("Evolution Done.");
     }
 
     /**
@@ -112,7 +110,7 @@ public class ImageCompressionGA {
     public void writeImage() {
         try {
             f = new File("CompressedImg.jpg"); //Output address
-            ImageIO.write(image, "jpg", f);
+            ImageIO.write(image, "bmp", f);
             System.out.println("Compression Complete.");
         } catch (IOException e) {
             System.out.println("Error: " + e);
