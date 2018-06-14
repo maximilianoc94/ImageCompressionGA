@@ -9,7 +9,6 @@ import java.awt.Graphics2D;
 import java.io.File;
 import java.io.IOException;
 import java.awt.image.BufferedImage;
-import java.math.BigInteger;
 import javax.imageio.ImageIO;
 
 /**
@@ -23,8 +22,8 @@ public class ImageCompressionGA {
     private final int width = 600;
     private final int height = 400;
     private final String imgAddress = "flying.bmp";
-    private final int cols = 20;
-    private final int rows = 20;
+    private final int cols = 150;
+    private final int rows = 100;
     //////////////////////////////////////////
     private File f = null;
     private BufferedImage image = null;
@@ -43,19 +42,32 @@ public class ImageCompressionGA {
         //Step 2
         this.evolveBlocks();
         //Step 3
-        //ToDo
-        //Save Compressed Image
-        this.writeImage();
+       int compressedSize = this.calculateCompressedSize();
+       System.out.println("Compression Complete. Size: "+ compressedSize +" Bytes");
+       //this.writeImage();
     }
-
+    
+    public int calculateCompressedSize(){
+        int size = 0;
+        for(int i = 0; i < this.blocks;  i++){
+           String dividendoBits =  Integer.toBinaryString(this.evolvedBlocks[i].compressedValues[0][0].intValue());
+           String divisorBits =  Integer.toBinaryString(this.evolvedBlocks[i].compressedValues[0][1].intValue());
+           size = size + dividendoBits.length()/8 + divisorBits.length()/8;
+        }
+        
+        return size;
+    }
+    
     /**
      * Rationalize Blocks Method for concatenating the values of every Pixel in
      * RGB as one string.
      */
     public void evolveBlocks() {
+
         for (int i = 0; i < this.blocks; i++) {
             this.evolvedBlocks[i] = new Evolution(this.blocksArray[i]);
         }
+        System.out.println("Evolving...");
         for (int i = 0; i < this.blocks; i++) {
             this.evolvedBlocks[i].start();
         }
@@ -98,7 +110,7 @@ public class ImageCompressionGA {
             this.f = new File(this.imgAddress);
             this.image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
             this.image = ImageIO.read(f);
-            System.out.println("Image loaded.");
+            System.out.println("Image loaded. Size: " + this.image.getWidth() * this.image.getHeight() * 3 + " Bytes");
         } catch (IOException e) {
             System.out.println("Error: " + e);
         }
@@ -111,7 +123,7 @@ public class ImageCompressionGA {
         try {
             f = new File("CompressedImg.jpg"); //Output address
             ImageIO.write(image, "bmp", f);
-            System.out.println("Compression Complete.");
+            System.out.println("Decompression Complete.");
         } catch (IOException e) {
             System.out.println("Error: " + e);
         }
