@@ -16,13 +16,13 @@ import java.util.concurrent.ThreadLocalRandom;
  */
 public class Evolution extends Thread {
 
-    
-    private final int epochs = 1000;
+    private final int epochs = 15;
+    private final int popSize = 40;
     private final BufferedImage assignedBlock;
     public String rationalizedBlock;
-    public String[] population = new String[80];
-    public String[] nextGen = new String[80];
-    public BigInteger[][] compressedValues = new BigInteger[80][2];
+    public String[] population = new String[popSize];
+    public String[] nextGen = new String[popSize];
+    public BigInteger[][] compressedValues = new BigInteger[popSize][2];
     public int[] fitness = new int[80];
     public BigInteger rational;
     public ArrayList<String> matingPool;
@@ -72,11 +72,9 @@ public class Evolution extends Thread {
     }
 
     public void nextGenerationByCrossover() {
-        int popSize = this.population.length;
-        int matingPoolSize = this.matingPool.size();
         for (int i = 0; i < popSize; i++) {
-            int a = ThreadLocalRandom.current().nextInt(0, popSize);
-            int b = ThreadLocalRandom.current().nextInt(0, popSize);
+            int a = ThreadLocalRandom.current().nextInt(0, this.popSize);
+            int b = ThreadLocalRandom.current().nextInt(0, this.popSize);
             String parentA = this.population[a];
             String parentB = this.population[b];
             this.nextGen[i] = this.crossoverChild(parentA, parentB);
@@ -90,6 +88,19 @@ public class Evolution extends Thread {
         child = parentA.substring(0, crossoverPoint) + parentB.substring(crossoverPoint);
         return child;
 
+    }
+
+    public void selectionByTournament() {
+        this.matingPool = new ArrayList<>();
+        for (int i = 0; i < popSize; i++) {
+            int a = ThreadLocalRandom.current().nextInt(0, popSize);
+            int b = ThreadLocalRandom.current().nextInt(0, popSize);
+            if (this.fitness[a] >= this.fitness[b]) {
+                this.matingPool.add(this.population[a]);
+            } else {
+                this.matingPool.add(this.population[b]);
+            }
+        }
     }
 
     public void selectionByWheel() {
@@ -143,12 +154,16 @@ public class Evolution extends Thread {
             this.compressedValues[i][0] = rationalNumber.divide(MCD);
             this.compressedValues[i][1] = maxNumber.divide(MCD);
 
-            if (this.compressedValues[i][0].intValue() <= 1000 || this.compressedValues[i][1].intValue() <= 1000) {
-                this.fitness[i] = ((int) (5000 / this.compressedValues[i][0].intValue()));
-            } else {
+            if (this.compressedValues[i][0].intValue() >= 1000 || this.compressedValues[i][1].intValue() >= 1000) {
                 this.fitness[i] = 1;
+            } else if (this.compressedValues[i][0].intValue() <= 10 || this.compressedValues[i][1].intValue() <= 10) {
+                this.fitness[i] = 100;
+            } else {
+                int x = 100 - this.compressedValues[i][0].divide(new BigInteger("10")).intValue();
+                this.fitness[i] = x;
             }
         }
+
     }
 
 }

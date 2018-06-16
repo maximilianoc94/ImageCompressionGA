@@ -35,6 +35,9 @@ public class ImageCompressionGA {
      * Start Main method for running the image compression.
      */
     public void start() {
+        int iteraciones = 100;
+        int[] compressedSize = new int[iteraciones];
+        for (int i = 0; i < iteraciones; i++){
         //Load Image
         this.readImage();
         //Step 1
@@ -42,9 +45,18 @@ public class ImageCompressionGA {
         //Step 2
         this.evolveBlocks();
         //Step 3
-       int compressedSize = this.calculateCompressedSize();
-       System.out.println("Compression Complete. Size: "+ compressedSize +" Bytes");
+       compressedSize[i] = this.calculateCompressedSize();
+       System.out.println((i+1) + ".- Compression Complete. Size: "+ compressedSize[i] +" Bytes");
        //this.writeImage();
+        }
+        int sum = 0;
+        for(int i = 0; i < iteraciones; i++){
+            sum = compressedSize[i] + sum;
+        }
+        System.out.println("------------------------------------------------------------------------");
+        int avg = sum/iteraciones;
+        System.out.println("Tamano promedio sobre: " + iteraciones+ " iteraciones: " + avg );
+        
     }
     
     public int calculateCompressedSize(){
